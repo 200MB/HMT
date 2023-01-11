@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.MB.hmt.HTMTestController">
+   <children>
+      <Label fx:id="wordLabel" alignment="CENTER" layoutY="23.0" prefHeight="69.0" prefWidth="600.0" text="Word" textAlignment="JUSTIFY" underline="true">
+         <font>
+            <Font size="48.0" />
+         </font>
+      </Label>
+      <Label fx:id="correctLabel" layoutX="34.0" layoutY="24.0" prefHeight="27.0" prefWidth="171.0" text="Correct">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <Label fx:id="incorrectLabel" layoutX="34.0" layoutY="58.0" prefHeight="27.0" prefWidth="171.0" text="Incorrect">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <Label fx:id="totalCountLabel" layoutX="34.0" layoutY="93.0" prefHeight="27.0" prefWidth="171.0" text="Total">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <Label id="0" fx:id="answerLabel1" alignment="CENTER" layoutY="145.0" prefHeight="69.0" prefWidth="600.0" text="1) Word" textAlignment="JUSTIFY">
+         <font>
+            <Font size="23.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Label>
+      <Label id="0" fx:id="answerLabel2" alignment="CENTER" layoutY="200.0" prefHeight="69.0" prefWidth="600.0" text="2) Word" textAlignment="JUSTIFY">
+         <font>
+            <Font size="23.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Label>
+      <Label id="0" fx:id="answerLabel3" alignment="CENTER" layoutY="258.0" prefHeight="69.0" prefWidth="600.0" text="3) Word" textAlignment="JUSTIFY">
+         <font>
+            <Font size="23.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Label>
+      <Label fx:id="answerLabel4" alignment="CENTER" layoutY="316.0" prefHeight="69.0" prefWidth="600.0" text="4) Word" textAlignment="JUSTIFY">
+         <font>
+            <Font size="23.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Label>
+   </children>
+</AnchorPane>
