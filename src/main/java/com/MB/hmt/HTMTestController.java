@@ -9,13 +9,6 @@ import javafx.scene.text.Text;
 import java.util.*;
 
 public class HTMTestController {
-
-    @FXML
-    private Label correctLabel;
-    @FXML
-    private Label incorrectLabel;
-    @FXML
-    private Label totalCountLabel;
     @FXML
     private Label wordLabel;
     @FXML
@@ -27,137 +20,113 @@ public class HTMTestController {
     @FXML
     private Label answerLabel4;
 
-    private int correct = 0, incorrect = 0, total;
+    private int correct = 0, incorrect = 0, total, QAIndex = 0;
 
     //hashmap where key is the answer and value is the question
     private final HashMap<String, String> HAQ = new HashMap<>();
 
-    ////hashmap where key is the question and value is the answer
     private final HashMap<String, String> HQA = new HashMap<>();
-    private final List<String> QA = HTMViewController.getQA();
+
+    private List<String> QA = HTMViewController.getQA();
 
 
     private final ArrayList<String> mutableQA = new ArrayList<>(QA);
+
+    private ArrayList<String> incorrectlyAnsweredQuestions = new ArrayList<>();
     private List<Label> labels = null;
 
 
     @FXML
     public void initialize() {
-        correctLabel.setText("Correct 0");
-        incorrectLabel.setText("Incorrect 0");
-        totalCountLabel.setText("Questions left %d".formatted(mutableQA.size()));
         labels = Arrays.asList(answerLabel1, answerLabel2, answerLabel3, answerLabel4);
-        setup();
-        updateFrame();
         setEventHandler();
-
+        initializeHashmap();
+        setWords();
     }
 
-    private void updateFrame() {
-        Collections.shuffle(mutableQA);
-        try {
-            wordLabel.setText(mutableQA.get(0).split("-")[0]);
-            setChoices(mutableQA.get(0).split("-")[1]);
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("NICE");
-        }
-    }
-
-    //works
-    private ArrayList<String> generateThreeUnique(String mainAnswer) {
-        Collections.shuffle(QA);
-        ArrayList<String> words = new ArrayList<>();
-        int added = 0;
-        words.add(mainAnswer);
-        for (int i = 0; i < QA.size() || added <= 3; i++) {
-            if (!QA.get(i).split("-")[1].equalsIgnoreCase(mainAnswer)) {
-                words.add(QA.get(i).split("-")[1]);
-                added++;
-            }
-        }
-
-        return words;
-    }
-
-    private void setChoices(String mainAnswer) {
-        ArrayList<String> words = generateThreeUnique(mainAnswer);
-        //Collections.shuffle(words);
-        int index = 0;
-        for (Label label : labels) {
-            label.setText(words.get(index++));
-        }
-
-    }
-
-    private void setup() {
-        for (String str : QA) {
-            String[] split = str.split("-");
+    private void initializeHashmap() {
+        System.out.println(QA);
+        for (String line : QA) {
+            String[] split = line.split("-");
+            System.out.println(Arrays.toString(split));
             HAQ.put(split[1], split[0]);
             HQA.put(split[0], split[1]);
         }
-        total = mutableQA.size();
-        Collections.shuffle(mutableQA);
     }
+
+    private void setWords() {
+        try {
+            String[] split = QA.get(QAIndex).split("-");
+            String question = split[0];
+            String answer = split[1];
+            ArrayList<String> words = get3Random();
+            words.add(answer);
+            Collections.shuffle(words);
+            setLabels(words, question);
+        } catch (IndexOutOfBoundsException ignored) {
+            QA = new ArrayList<>(reconstructLines());
+            System.out.println(QA);
+            QAIndex = 0;
+            if (QA.size() == 0) return;
+            setWords();
+        }
+    }
+
+    private void setLabels(ArrayList<String> words, String question) {
+        ListIterator<String> iterator = words.listIterator();
+        wordLabel.setText(question);
+        for (Label label : labels) {
+            label.setText(iterator.next());
+        }
+    }
+
+    private ArrayList<String> reconstructLines() {
+        ArrayList<String> reconstructedLines = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String str : incorrectlyAnsweredQuestions) {
+            stringBuilder.append(str).append("-").append(HQA.get(str));
+            reconstructedLines.add(stringBuilder.toString());
+            stringBuilder = new StringBuilder();
+        }
+        incorrectlyAnsweredQuestions = new ArrayList<>();
+        return reconstructedLines;
+    }
+
+
+    private ArrayList<String> get3Random() {
+        int counter = 0;
+        ArrayList<String> words = new ArrayList<>();
+        Collections.shuffle(mutableQA);
+        for (int i = 0; i < mutableQA.size() && counter < 3; i++) {
+            if (!mutableQA.get(i).equalsIgnoreCase(QA.get(QAIndex))) {
+                words.add(mutableQA.get(i).split("-")[1]);
+                counter++;
+            }
+        }
+        QAIndex++;
+        return words;
+
+    }
+
 
     private void setEventHandler() {
         EventHandler<MouseEvent> eventHandler = mouseEvent -> {
             Text text = (Text) mouseEvent.getPickResult().getIntersectedNode();
-            if (wordLabel.getText().equalsIgnoreCase(HAQ.get(text.getText()))) {
-                updateCorrect(text);
+            System.out.printf("User picked %s%n", text.getText());
+            if (HAQ.get(text.getText()).equalsIgnoreCase(wordLabel.getText())) {
+                System.out.println("Correct!");
+                correct++;
+            } else {
+                System.out.println("Incorrect!");
+                incorrectlyAnsweredQuestions.add(wordLabel.getText());
+                incorrect++;
             }
-            if (!wordLabel.getText().equalsIgnoreCase(HAQ.get(text.getText()))){
-                removeWordFromMutable(text.getText());
-                updateIncorrect();
-            }
-            if (incorrect + correct == total) {
-                resetCounter();
-            }
-            updateFrame();
-
+            setWords();
         };
         answerLabel1.setOnMouseClicked(eventHandler);
         answerLabel2.setOnMouseClicked(eventHandler);
         answerLabel3.setOnMouseClicked(eventHandler);
         answerLabel4.setOnMouseClicked(eventHandler);
-    }
-
-    private void removeWordFromMutable(String answer) {
-        for (int i = 0; i < mutableQA.size(); i++) {
-            try {
-                if (mutableQA.get(i).split("-")[1].equalsIgnoreCase(answer)) {
-                    mutableQA.remove(i);
-                    break;
-                }
-
-            } catch (ArrayIndexOutOfBoundsException e) {
-                if (mutableQA.get(i).equalsIgnoreCase(answer)) {
-                    mutableQA.remove(i);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void updateCorrect(Text text) {
-        correctLabel.setText("Correct %d".formatted(++correct));
-        totalCountLabel.setText("Questions left %d".formatted(mutableQA.size()));
-        removeWordFromMutable(text.getText());
-
-    }
-
-    private void updateIncorrect() {
-        incorrectLabel.setText("Incorrect %d".formatted(++incorrect));
-        totalCountLabel.setText("Questions left %d".formatted(mutableQA.size()));
-
-    }
-
-    private void resetCounter() {
-        correctLabel.setText("Correct 0");
-        incorrectLabel.setText("Incorrect 0");
-        totalCountLabel.setText("Questions left %d".formatted(mutableQA.size()));
-        correct = 0;
-        incorrect = 0;
-        total = mutableQA.size();
     }
 
 

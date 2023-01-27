@@ -2,7 +2,6 @@ package com.MB.hmt;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
@@ -26,6 +25,7 @@ public class HTMViewController {
             String line;
             BufferedReader reader = new BufferedReader(new FileReader(txt));
             while ((line = reader.readLine()) != null) {
+                if (line.length() == 0) continue;
                 QA.add(line);
             }
             System.out.println("OPENED FILE");
